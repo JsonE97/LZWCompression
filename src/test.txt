@@ -1,0 +1,4 @@
+this is a test
+for the LZW algorithm
+to try and truncate the size
+of a stored text file

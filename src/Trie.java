@@ -70,7 +70,6 @@ public class Trie {
             } else if (next != null) { // try next sibling
                 next = next.getSibling();
             } else { // no more siblings: need new node
-                advancedInsert(w, current, next);
                 // could have kept track of the siblings when searching
                 // to avoid going through the siblings twice
 

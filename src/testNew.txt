@@ -1,7 +1,0 @@
-Input file test.txt  LZW algorithm
-
-Original file length in bits : 704
-Compressed file length in bits : 552
-Compressed ratio = 0.7841
-
-Elapsed time: 29 milliseconds

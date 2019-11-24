@@ -1,9 +1,21 @@
+/**
+ * Required imports for class
+ */
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Public class to encapsulate the LZW compression algorithm
+ */
+
 public class LZWAlgorithm {
+
+    /**
+     * Private class variables
+     */
 
     private int codeCount;
     private String inFile;
@@ -11,14 +23,27 @@ public class LZWAlgorithm {
     private ArrayList<Character> chars;
     private int fileLength;
 
+    /**
+     * Public constructor for LZWAlgorithm
+     *
+     * @param inputFileName - String - file name to be read from
+     * @throws IOException
+     */
+
     public LZWAlgorithm(String inputFileName) throws IOException {
         inFile = inputFileName;
         codeCount = 0;
         fileLength = 0;
         trie = new Trie();
-        chars = new ArrayList<Character>();
+        chars = new ArrayList<>();
         executeAlgorithm();
     }
+
+    /**
+     * executeAlgorithm - public method to execute the main LZW steps
+     *
+     * @throws IOException
+     */
 
     public void executeAlgorithm() throws IOException {
         initialiseTrie();
@@ -26,15 +51,24 @@ public class LZWAlgorithm {
         addWordsToTrie();
     }
 
-    public void initialiseTrie() {
+    /**
+     * initialiseTrie - Algorithm uses a trie for storage prefixes to words
+     */
+
+    private void initialiseTrie() {
         //generate initial trie of ASCII chars
         for (int i = 0; i <= 127; i++) {
             trie.insert(String.valueOf((char) (i)));
-
         }
     }
 
-    public void readFromFile() throws IOException {
+    /**
+     * readFromFile - method to read from the given file in class construction
+     *
+     * @throws IOException
+     */
+
+    private void readFromFile() throws IOException {
         FileReader reader = new FileReader(inFile);
         Scanner in = new Scanner(reader);
 
@@ -45,7 +79,6 @@ public class LZWAlgorithm {
                 fileLength++;
                 chars.add(line.charAt(i));
             }
-
             //adds each new line as the current line is traversed
             fileLength++;
             chars.add('\n');
@@ -56,17 +89,17 @@ public class LZWAlgorithm {
             } else {
                 line = null;
             }
-
-
         }
+        in.close();
         reader.close();
     }
 
-    public void addWordsToTrie() {
-        ArrayList<Character> chars = getChars();
-        int i = 0;
-        String s;
+    /**
+     * addWordsToTrie - adds words loaded into ArrayList (chars) to the trie
+     */
 
+    private void addWordsToTrie() {
+        int i = 0;
         //start the count from 128 as the ASCII chars are already in the trie
         long count = 128;
 
@@ -75,59 +108,52 @@ public class LZWAlgorithm {
 
         //whilst the position is within index of the chars array list
         while (i < chars.size()) {
-
-            //get the current char from the given index i
-            s = String.valueOf(chars.get(i));
+            String s = String.valueOf(chars.get(i));
 
             //while loop to get the largest string s in the trie
-            while ((i + s.length() < chars.size()) && getTrie().search(s)) {
+            while ((i + s.length() < chars.size()) && trie.search(s)) {
 
                 //appends the new char to s if it is already in the trie
                 s = s + String.valueOf(chars.get(i + s.length()));
             }
 
-            //increments i by the length of s
             i += s.length();
-
             //decrements i if the length is greater than 1 to go back a char
             if (s.length() > 1) {
                 i = i - 1;
             }
-
-            if (i < chars.size() && !getTrie().search(s)) {
-
-                //inserts new string s to trie, increments count, and adds the new codeWordLength to the codeCount
-                getTrie().insert(s);
+            if (i < chars.size() && !trie.search(s)) {
+                trie.insert(s);
                 count++;
-                setCodeCount(getCodeCount() + codeWordLength);
+                codeCount += codeWordLength;
             }
-
-
             //checks whether the codeWordLength needs increased to double dictionary space
             if (count > Math.pow(2, codeWordLength)) {
                 codeWordLength += 1;
             }
         }
-
         //adds the final codeWord of the file
-        setCodeCount(getCodeCount() + codeWordLength);
+        codeCount += codeWordLength;
     }
 
-    public Trie getTrie() {
-        return trie;
-    }
+    /**
+     * Required getters
+     */
 
-    public ArrayList<Character> getChars() {
-        return chars;
-    }
 
-    public void setCodeCount(int newCodeCount) {
-        codeCount = newCodeCount;
-    }
+    /**
+     * getFileLength
+     * @return - int - fileLength
+     */
 
     public int getFileLength() {
         return fileLength;
     }
+
+    /**
+     * getCodeCount
+     * @return - int - codeCount
+     */
 
     public int getCodeCount() {
         return codeCount;
